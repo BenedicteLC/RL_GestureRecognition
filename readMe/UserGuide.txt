@@ -1,0 +1,107 @@
+/*********************/
+ Installation
+/*********************/
+
+1. Place the "gesture_recognition" package into your ROS directory. Currently does not support catkin.
+2. Download and install the required librairies: OpenNI, OpenCV, NiTE. For help, view the instructions
+   related to "openni_tracker" on the ROS Wiki or ROS Answers.
+3. Download and rosmake the ROS "sound_play" package (no need to install the other packages bundled with it).
+4. Travel to the "gesture_recognition" package.
+5. make (not rosmake).
+
+
+/*********************/
+ Running the nodes
+/*********************/
+
+1. Feature extractor & joint tracker: "roslaunch gesture_recognition tracker.launch"
+2. Trainer: "rosrun gesture_recognition trainer"
+3. Classifier: "rosrun gesture_recognition classifier"
+4. Tester: "rosrun gesture_recognition tester"
+5. Converter: "rosrun gesture_recognition converter"
+
+
+/*********************/
+ How to use
+/*********************/
+
+/*** Feature extractor ***/
+1. Perform the Psi pose. Check the "openni_tracker" wiki for more info.
+2. Wait for calibration to complete.
+3. Perform as many gestures as desired:
+	a. Hold your left hand still until you hear a beep.
+	b. Perform a gesture.
+	c. Hold you left hand still until you hear a beep. 
+
+/*** Trainer ***/
+1. The trainer uses the file: "trainingSamples.csv" (creates it when it doesn't exist).
+2. Adding new samples (optional):
+	a. To add new samples to the file, the feature extractor must be running.
+	b. Perform a gesture and the trainer will prompt you for a label (integer). Type it in
+	and press enter. 
+	Note that you can perform many gestures without entering their labels, then
+	write all labels in sequence (ex: 1, enter, 1, enter, etc.). If a mistake is made, you can
+	type in an error label (ex: 0 or 100, whatever suits you), then remove it manually from the csv.
+3. Training the forest:
+	a. When you are done adding new samples or if you want to train the forest right away, press "CTRL C".
+	b. Follow the instructions on the terminal.
+
+/*** Classifier ***/
+1. The feature extractor must be running.
+2. Perform a gesture and observe the value reported by the classifier.
+Note that the random forests classifer currently discards a gesture with bad confidence.
+
+/*** Tester ***/
+1. The tester uses the file: "testingSamples.csv". The testing samples are obtained by renaming
+the training samples file.
+2. The tester reports the amount of mispredictions.
+3. The tester is used for debugging and cross-validation.
+
+/*** Converter ***/
+1. The converter is an offline tool used to apply a filter to a raw csv database.
+It reads the file: "testingSamples.csv" and outputs "converted.csv".
+
+/*********************/
+ Class descriptions
+/*********************/
+
+*Classifier.cpp: Classifier. Outputs label name to the terminal and sends a wheelchair command.
+
+*Converter.cpp: Offline converter tool to apply a filter to a csv.
+
+*CvRTreesMultiClass.cpp: Random forest that takes voting confidence into account.
+MaxVote parameter must be optimized. 
+
+*FeatureExtractor.cpp: Feature extractor. Contains a modified version of "openni_tracker". Normalizes
+and filters the feature vectors (sometimes, you might want to disable filtering to build a raw csv). Plays sound effects.
+Feature vector is published on "features" topic.
+
+*filter.cpp: Filters a feature vector. Currently uses a directional equivalence filter.
+
+*GestureState.cpp: State machine for the current state of gesture capture. Detects the initialization/termination
+gesture.
+
+*normalization.cpp: Extends the length of a feature to a standard length by duplicating its elements.
+
+*RandomForest.cpp: Crude OpenCV random forest. Parameters must be optimized.
+
+*Samples.cpp: Gesture samples that consist of a feature vector and a label.
+
+*tester.cpp: Tester. Evaluates the performance of the current random forest against a testing set.
+
+*trainer.cpp: Trainer. Stores incoming samples into "trainingSamples.csv" and build the random forest using
+the contents of this file.
+
+
+/*********************/
+ Known issues
+/*********************/
+
+1. Problem: The program is not behaving as expected: many mispredictions, always reporting the same gesture, etc.
+=> Make sure you are running the nodes from the "gesture_recognition" directory.
+
+2. Problem: make reports the error: 
+	"error: ‘gesture_recognition::Feat’ has no member named ‘leftXY’
+	/home/groovy_workspace/gesture_recognition/src/FeatureExtractor.cpp:385:13: error: ‘gesture_recognition::Feat’ 
+	-has no member named ‘leftZ’"
+=> Delete the "msg_gen" directory in the "gesture_recognition" package.

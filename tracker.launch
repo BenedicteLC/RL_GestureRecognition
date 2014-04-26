@@ -1,0 +1,8 @@
+<launch>
+      <node pkg="gesture_recognition" type="FeatureExtractor" name="FeatureExtractor" output=
+    "screen">
+        <param name="camera_frame_id" value="/camera_link" />
+        <param name="tf_prefix" value="tracker" />
+      </node>
+	<node pkg="sound_play" type="soundplay_node.py" name="soundplay_node"/>
+</launch>

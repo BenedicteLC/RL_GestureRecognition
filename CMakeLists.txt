@@ -1,0 +1,46 @@
+cmake_minimum_required(VERSION 2.4.6)
+include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+
+rosbuild_init()
+rosbuild_add_boost_directories()
+rosbuild_genmsg()
+
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin)
+include_directories (${CMAKE_CURRENT_BINARY_DIR})
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
+
+include(FindPkgConfig)
+pkg_check_modules(OPENNI libopenni)
+include_directories(${OPENNI_INCLUDEDIR} /usr/include/nite)
+
+INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIRS})
+find_package(OpenCV REQUIRED) 
+
+add_library(GestureState src/GestureState.cpp)
+add_library(normalization src/normalization.cpp)
+add_library(filter src/filter.cpp)
+rosbuild_add_executable(FeatureExtractor src/FeatureExtractor.cpp)
+target_link_libraries (FeatureExtractor GestureState) 
+target_link_libraries (FeatureExtractor normalization) 
+target_link_libraries (FeatureExtractor filter) 
+target_link_libraries(FeatureExtractor ${OPENNI_LIBRARIES} ${OpenCV_LIBS})
+
+add_library(Sample src/Sample.cpp) 
+add_library(Forest src/RandomForest.cpp)
+add_library(Tree src/CvRTreesMultiClass.cpp) 
+target_link_libraries(Forest ${OpenCV_LIBS}) 
+target_link_libraries(Forest Sample) 
+target_link_libraries(Tree ${OpenCV_LIBS})
+
+rosbuild_add_executable(trainer src/trainer.cpp) 
+rosbuild_add_executable(classifier src/classifier.cpp) 
+rosbuild_add_executable(tester src/tester.cpp) 
+rosbuild_add_executable(converter src/converter.cpp) 
+target_link_libraries (trainer Forest)
+target_link_libraries(classifier Forest)
+target_link_libraries(classifier Tree)
+target_link_libraries(tester Tree)
+target_link_libraries(tester Forest)
+target_link_libraries(converter normalization)
+target_link_libraries(converter filter)
+

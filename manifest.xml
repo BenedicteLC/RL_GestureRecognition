@@ -1,0 +1,25 @@
+﻿<package>
+  <description brief="Dynamic gesture recognition">
+
+    openni_tracker broadcasts the OpenNI skeleton frames using tf.
+
+  </description>
+  <author>Benedicte LC, Samantha R, Tim Field</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>none</url>
+
+  <depend package="geometry_msgs"/>
+  <!--depend package="kdl"/-->
+  <depend package="roscpp"/>
+  <depend package="roslib"/>
+  <depend package="tf"/>
+  <depend package="sound_play"/>
+ 
+  <rosdep name="libopenni-dev"/>
+  <rosdep name="libusb-1.0-dev" />
+  <rosdep name="libopenni-nite-dev"/>
+  <rosdep name="libopenni-sensor-primesense-dev"/>
+  
+   <rosdep name="2.4"/>
+</package>

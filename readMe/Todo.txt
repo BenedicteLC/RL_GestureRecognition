@@ -1,0 +1,8 @@
+ 1. Expand the gesture database & add samples collected when the wheelchair is in motion.
+ 2. Better way of handling false positives: gesture capture should not start when the user is motionless.
+ 3. Distinct audio feedback for each recognized gesture. Text-to-speech or prerecorded.
+ 4. Is there a need for visual feedback?
+ 5. Should the program wait for a confirmation gesture before starting motion?
+ 6. Experiment with new filters.
+ 7. Program an automatic cross-validation tool changing the random forest parameters dynamically. 
+    Currently has to be done manually and recompile between each change.
